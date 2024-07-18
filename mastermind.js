@@ -1,3 +1,4 @@
+// https://jsdoc.app
 /**
  * @function checkGuess
  * Checks guess for "mastermind" game against solution
@@ -5,7 +6,7 @@
  * @param {string} guess - the solution to the
  * @param {string} solution - the target for the guess
  *
- * @returns {string} - an string representing the number of corect numbers
+ * @returns {string} - an string representing the number of correct numbers
  *                     in the correct position and the number of correct
  *                     numbers in the incorrect position for the guess
  *
@@ -30,40 +31,43 @@ function checkGuess(guess, solution) {
   // "count of correct characters in the right place"-"count of correct
   // characters not in the right place"
   // for example, "2-1"
+  //
 
-  // Initiliaze variable to track correct position
+  // Initialize variables to track correct and incorrect positions
   let correctPosition = 0;
-  // Initialiaze variable to keep track of incorrectPosition
   let incorrectPosition = 0;
-
+  
   // objects to track occurances of each digit
-  const guessFrequency = {};
-  const solutionFrequency = {};
+  const guessFrequency = {}
+  const solutionFrequency = {}
 
   // We are going to loop through the array and compare values to see if the placement is correct or not
-  for (let i = 0; i < guess.length; i++) {
+  for(let i = 0; i < guess.length; i++){
     // condition to see if the number a guess index i is equal to the solution at index i
-    if (guess[i] === solution[i]) {
+    if(guess[i] === solution[i]){
       // if the guess at index i is equal to the solution at index i, we increment the correctPosition
       correctPosition++;
-    } else {
+    }
+    else{
       // We keep track of the number of times the solution appears
-      guessFrequency[solution[i]] = (solutionFrequency[solution[i]] || 0) + 1;
-      solutionFrequency[guess[i]] = (guessFrequency[guess[i]] || 0) + 1;
+      guessFrequency[guess[i]] = (guessFrequency[guess[i]] || 0) + 1;
+      solutionFrequency[solution[i]] = (solutionFrequency[solution[i]] || 0) + 1;
     }
   }
-
   // loop to count the correct numbers in incorrect positions
   for (const digit in guessFrequency) {
     if (solutionFrequency[digit]) {
       // the number of times this digit appears in both, but not in the correct position
-      incorrectPosition += Math.min(
+      const minCount = Math.min(
         guessFrequency[digit],
-        solutionFrequency[digit],
+        solutionFrequency[digit]
       );
+      // because these digits are correct but not in the correct position
+      incorrectPosition += minCount;
     }
   }
-
+  // Remove correct numbers from incorrect position count
+  incorrectPosition -= correctPosition;
   return `${correctPosition}-${incorrectPosition}`;
 }
 
