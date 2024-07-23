@@ -1,101 +1,88 @@
 // https://jsdoc.app
 /**
- * @function checkGuess
- * Checks guess for "mastermind" game against solution
- *
- * @param {string} guess - the solution to the
- * @param {string} solution - the target for the guess
- *
- * @returns {string} - an string representing the number of correct numbers
- *                     in the correct position and the number of correct
- *                     numbers in the incorrect position for the guess
- *
- * @example
- * checkGuess('1532, '1234')
- * // returns '2-1'
- * // two numbers in the correct place (1 and 3)
- * // and one correct number in the incorrect place (2)
- *
- */
-function checkGuess(guess, solution) {
-  // TODO: complete this function
-  // first determine how many characters total the two strings have in common
-  // This may help:
-  // https://github.com/bonnie/udemy-ENZYME/blob/master/context-base/src/helpers/index.js
-  //
-  // then determine how many of those characters are in the right place
-  // hint: iterate through characters of guess and compare to character
-  // in the same position in solution
-  //
-  // finally, return a string in the format
-  // "count of correct characters in the right place"-"count of correct
-  // characters not in the right place"
-  // for example, "2-1"
-  //
+* @function calculateCorrectPositions
+* Calculates the number of correct digits in the correct position.
+*
+* @param {string} guess - The guess made by the player.
+* @param {string} solution - The correct solution to be guessed.
+*
+* @returns {number} - The number of correct digits in the correct position.
+* -----------------------------------------------------------------------------
+* @function calculateIncorrectPositions
+* Calculates the number of correct digits in the incorrect position.
+*
+* @param {string} guess - The guess made by the player.
+* @param {string} solution - The correct solution to be guessed.
+*
+* @returns {number} - The number of correct digits in the incorrect position.
+*---------------------------------------------------------------------------------
+* @function checkGuess
+* Checks the guess against the solution and returns a formatted string
+* representing correct and incorrect positions.
+*
+* @param {string} guess - The guess made by the player.
+* @param {string} solution - The correct solution to be guessed.
+*
+* @returns {string} - A string formatted as 'correct-incorrect' where
+*                     'correct' is the number of correct positions and
+*                     'incorrect' is the number of incorrect positions.
+*/
 
-  // Initialize variables to track correct and incorrect positions
+
+function calculateCorrectPositions(guess, solution) {
+
   let correctPosition = 0;
-  let incorrectPosition = 0;
-  
-  // objects to track occurances of each digit
-  const guessFrequency = {}
-  const solutionFrequency = {}
 
-  // We are going to loop through the array and compare values to see if the placement is correct or not
-  for(let i = 0; i < guess.length; i++){
-    // condition to see if the number a guess index i is equal to the solution at index i
-    if(guess[i] === solution[i]){
-      // if the guess at index i is equal to the solution at index i, we increment the correctPosition
+  // Iterate through each character in the guess
+  for (let i = 0; i < guess.length; i++) {
+    if (guess[i] === solution[i]) {  // Increment correctPosition if the guess digit matches the solution digit at the same position
       correctPosition++;
     }
-    else{
-      // We keep track of the number of times the solution appears
+  }
+  return correctPosition;
+}
+
+function calculateIncorrectPositions(guess, solution) {
+  const guessFrequency = {};
+  const solutionFrequency = {};
+  let incorrectPosition = 0;
+
+  // Count the frequency of each digit in guess and solution where digits are in incorrect positions
+  for (let i = 0; i < guess.length; i++) {
+    if (guess[i] !== solution[i]) {
       guessFrequency[guess[i]] = (guessFrequency[guess[i]] || 0) + 1;
       solutionFrequency[solution[i]] = (solutionFrequency[solution[i]] || 0) + 1;
     }
   }
-  // loop to count the correct numbers in incorrect positions
+
+  // Compare frequencies to count how many digits are correct but in the wrong position
   for (const digit in guessFrequency) {
     if (solutionFrequency[digit]) {
-      // the number of times this digit appears in both, but not in the correct position
       const minCount = Math.min(
         guessFrequency[digit],
         solutionFrequency[digit]
       );
-      // because these digits are correct but not in the correct position
       incorrectPosition += minCount;
     }
   }
-  // Remove correct numbers from incorrect position count
-  incorrectPosition -= correctPosition;
-  return `${correctPosition}-${incorrectPosition}`;
+
+  return incorrectPosition;
 }
 
-// https://jsdoc.app
-/**
- * @function processInput
- * Checks guesses for "mastermind" game against solution
- *
- * @param {string} solution - the target for the guesses
- * @param {string[]} guesses - an array of strings representing guesses
- *
- * @returns {string[]} - an array of strings representing the number of
- *                       correct numbers in the correct position and the number
- *                       of correct numbers in the incorrect position for each
- *                       guess
- *
- * @example
- * // returns ['2-1', '0-1']
- * processInput('1234', ['1532', '8793'])
- *
- */
-function processInput(solution, guesses) {
+function checkGuess(guess, solution) {
+  const correctPosition = calculateCorrectPositions(guess, solution);
+  const incorrectPosition = calculateIncorrectPositions(guess, solution);
+
+  return `${correctPosition}-${incorrectPosition}`; // Return the result as a string formatted 'correct-incorrect'
+}
+
+function evaluateGuessesAgainstSolution(solution, guesses) {
+  // Apply the checkGuess function to each guess and return the results
   return guesses.map((guess) => checkGuess(guess, solution));
 }
 
 // ----------- main program ------- //
 // process arguments via destructuring
-//
 const [solution, guessCount, ...guesses] = process.argv.slice(2);
 
 // (lightly) verify the input
@@ -108,5 +95,5 @@ if (guesses.length !== Number(guessCount)) {
 }
 
 // pass the input to the processor and print the output
-const output = processInput(solution, guesses);
+const output = evaluateGuessesAgainstSolution(solution, guesses);
 console.log(output.join(" "));
